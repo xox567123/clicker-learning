@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101321">
-  <meta name="description" content="A clicker game with rebirths, prestige, lucky clicks, and progress saved on your device.">
+  <meta name="description" content="A clicker game with passive income, stickman battles, rebirths, prestige, and progress saved on your device.">
   <title>Clicker Learning</title>
   <style>
     :root {
@@ -48,9 +48,34 @@
       backdrop-filter: blur(16px);
     }
 
-    header { margin-bottom: 24px; text-align: center; }
+    header { margin-bottom: 20px; text-align: center; }
     h1 { margin: 0; font-size: clamp(28px, 8vw, 42px); letter-spacing: -0.04em; }
     .subtitle { margin: 8px 0 0; color: var(--muted); }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 5px;
+      border: 1px solid var(--panel-border);
+      border-radius: 17px;
+      background: rgba(5, 7, 16, 0.42);
+    }
+
+    .tab {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .tab[aria-selected="true"] {
+      border-color: rgba(139, 124, 255, 0.35);
+      background: rgba(139, 124, 255, 0.18);
+      color: var(--text);
+    }
 
     .stats {
       display: grid;
@@ -144,27 +169,50 @@
       color: #9ff3ce;
     }
 
-    .prestige-panel {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 14px;
+    .prestige-panel, .game-panel {
       margin-bottom: 18px;
-      padding: 15px 16px;
+      padding: 16px;
       border: 1px solid rgba(255, 131, 197, 0.2);
       border-radius: 18px;
       background: linear-gradient(110deg, rgba(255, 131, 197, 0.09), rgba(139, 124, 255, 0.08));
     }
 
-    .prestige-title { margin: 0 0 4px; font-weight: 800; }
-    .prestige-help { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+    .prestige-panel {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 14px;
+    }
 
-    #prestige-btn {
+    .prestige-title, .game-title { margin: 0 0 4px; font-weight: 800; }
+    .prestige-help, .game-help { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+    #prestige-btn, #upgrade-passive-btn {
       padding: 0 18px;
       background: linear-gradient(135deg, #d65baf, #8958e8);
       box-shadow: 0 8px 22px rgba(214, 91, 175, 0.18);
       white-space: nowrap;
     }
+
+    .passive-card { border-color: rgba(85, 214, 164, 0.22); }
+    .passive-rate { margin: 16px 0; color: var(--success); font-size: 1.65rem; font-weight: 850; }
+    .fight-card { border-color: rgba(255, 105, 120, 0.24); }
+    .arena {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      text-align: center;
+    }
+    .fighter { padding: 12px 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.035); }
+    .fighter-icon { display: block; min-height: 54px; margin-bottom: 4px; font-size: 2.5rem; }
+    .fighter-name { display: block; margin-bottom: 8px; font-weight: 800; }
+    .health-track { height: 8px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.1); }
+    .health-bar { height: 100%; border-radius: inherit; background: var(--success); transition: width 180ms ease; }
+    .enemy-health { background: var(--danger); }
+    .versus { color: var(--muted); font-size: 0.8rem; font-weight: 900; }
+    #fight-btn { width: 100%; background: linear-gradient(135deg, #ff6978, #d83f68); }
 
     .code-box { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 
@@ -181,10 +229,7 @@
       font: inherit;
     }
 
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(139, 124, 255, 0.13);
-    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 124, 255, 0.13); }
 
     #redeem-btn {
       padding: 0 20px;
@@ -203,6 +248,7 @@
     .status.error { color: var(--danger); }
     .status.success { color: var(--success); }
     .status.lucky { color: var(--gold); }
+    [hidden] { display: none !important; }
 
     @media (max-width: 480px) {
       body { padding: 12px; }
@@ -212,22 +258,28 @@
       .actions { grid-template-columns: 1fr; }
       #rebirth-btn { width: 100%; }
       .prestige-panel { grid-template-columns: 1fr; }
-      #prestige-btn { width: 100%; }
+      #prestige-btn, #upgrade-passive-btn { width: 100%; min-height: 50px; }
       .code-box { grid-template-columns: 1fr; }
       #redeem-btn { width: 100%; }
+      .arena { gap: 6px; }
+      .fighter { padding: 10px 5px; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
 <body>
   <main class="shell">
     <header>
       <h1>Clicker Learning</h1>
-      <p class="subtitle">Click, rebirth, and chase the multiplier.</p>
+      <p class="subtitle">Click, earn passively, or battle for money.</p>
     </header>
+
+    <nav class="tabs" role="tablist" aria-label="Game modes">
+      <button class="tab" id="tab-clicker" type="button" role="tab" aria-selected="true" aria-controls="panel-clicker">🖱️ Clicker</button>
+      <button class="tab" id="tab-passive" type="button" role="tab" aria-selected="false" aria-controls="panel-passive" tabindex="-1">💸 Passive</button>
+      <button class="tab" id="tab-fight" type="button" role="tab" aria-selected="false" aria-controls="panel-fight" tabindex="-1">⚔️ Fight</button>
+    </nav>
 
     <section class="stats" aria-label="Game statistics">
       <div class="stat">
@@ -244,27 +296,61 @@
       </div>
     </section>
 
-    <div class="progress-track" aria-label="Progress to rebirth">
-      <div class="progress-bar" id="rebirth-progress"></div>
-    </div>
-
-    <section class="actions">
-      <button id="earn-btn" type="button">✨ Earn +<span id="earn-amount">1</span></button>
-      <button id="rebirth-btn" type="button" disabled>Rebirth</button>
-    </section>
-
-    <section class="prestige-panel" aria-label="Prestige upgrade">
-      <div>
-        <p class="prestige-title">🌌 Prestige</p>
-        <p class="prestige-help">Requires 10 rebirths. Prestige resets your money and rebirths, but adds +0.50 to your permanent prestige boost.</p>
+    <section id="panel-clicker" role="tabpanel" aria-labelledby="tab-clicker">
+      <div class="progress-track" aria-label="Progress to rebirth">
+        <div class="progress-bar" id="rebirth-progress"></div>
       </div>
-      <button id="prestige-btn" type="button" disabled>Prestige</button>
+
+      <section class="actions">
+        <button id="earn-btn" type="button">✨ Earn +<span id="earn-amount">1</span></button>
+        <button id="rebirth-btn" type="button" disabled>Rebirth</button>
+      </section>
+
+      <section class="prestige-panel" aria-label="Prestige upgrade">
+        <div>
+          <p class="prestige-title">🌌 Prestige</p>
+          <p class="prestige-help">Requires 10 rebirths. Prestige resets your money and rebirths, but adds +0.50 to your permanent prestige boost.</p>
+        </div>
+        <button id="prestige-btn" type="button" disabled>Prestige</button>
+      </section>
+
+      <div class="code-box">
+        <input type="text" id="code-input" placeholder="Enter code..." autocomplete="off" aria-label="Redeem code">
+        <button id="redeem-btn" type="button">Redeem</button>
+      </div>
     </section>
 
-    <div class="code-box">
-      <input type="text" id="code-input" placeholder="Enter code..." autocomplete="off">
-      <button id="redeem-btn" type="button">Redeem</button>
-    </div>
+    <section id="panel-passive" role="tabpanel" aria-labelledby="tab-passive" hidden>
+      <div class="game-panel passive-card">
+        <p class="game-title">💸 Passive income</p>
+        <p class="game-help">Your businesses keep earning while you play—and for up to 8 hours while you're away. Buy levels to increase your income.</p>
+        <p class="passive-rate"><span id="passive-rate">0</span> money / sec</p>
+        <button id="upgrade-passive-btn" type="button">Buy income level · <span id="passive-cost">25</span></button>
+        <p class="game-help" style="margin-top: 12px">Income level: <strong id="passive-level">0</strong></p>
+      </div>
+    </section>
+
+    <section id="panel-fight" role="tabpanel" aria-labelledby="tab-fight" hidden>
+      <div class="game-panel fight-card">
+        <p class="game-title">⚔️ Stickman arena</p>
+        <p class="game-help">Take turns attacking. Beat the stickman to earn a cash reward; your health is restored for the next round.</p>
+        <div class="arena" aria-label="Battle status">
+          <div class="fighter">
+            <span class="fighter-icon" aria-hidden="true">🧍</span>
+            <span class="fighter-name">You · <span id="player-hp-text">100</span> HP</span>
+            <div class="health-track"><div class="health-bar" id="player-health"></div></div>
+          </div>
+          <span class="versus">VS</span>
+          <div class="fighter">
+            <span class="fighter-icon" aria-hidden="true">🥷</span>
+            <span class="fighter-name">Stickman · <span id="enemy-hp-text">25</span> HP</span>
+            <div class="health-track"><div class="health-bar enemy-health" id="enemy-health"></div></div>
+          </div>
+        </div>
+        <button id="fight-btn" type="button">🥊 Attack the stickman</button>
+        <p class="game-help" style="margin-top: 12px; text-align: center">Stickmen defeated: <strong id="fight-wins">0</strong></p>
+      </div>
+    </section>
 
     <p class="status" id="status" role="status" aria-live="polite">Progress is saved on this device. Lucky clicks can happen any time!</p>
   </main>
@@ -273,7 +359,7 @@
     const SAVE_KEY = "clickerLearningSaveV1";
     const REBIRTH_COST = 1000;
     const PRESTIGE_REBIRTH_COST = 10;
-
+    const OFFLINE_CAP_SECONDS = 8 * 60 * 60;
     const codes = {
       bob: 500,
       cod: 1000,
@@ -289,6 +375,7 @@
     };
 
     let state = loadState();
+    let fight = { wins: 0, playerHp: 100, enemyHp: 25, enemyMaxHp: 25 };
     const earnButton = document.querySelector("#earn-btn");
     const rebirthButton = document.querySelector("#rebirth-btn");
     const prestigeButton = document.querySelector("#prestige-btn");
@@ -300,21 +387,23 @@
       try {
         const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
         if (!saved) throw new Error("No save");
-
         return {
           money: Number.isFinite(saved.money) ? Math.max(0, saved.money) : 0,
           rebirthCount: Number.isFinite(saved.rebirthCount) ? Math.max(0, saved.rebirthCount) : 0,
           rebirthMult: Number.isFinite(saved.rebirthMult) ? Math.max(1, saved.rebirthMult) : 1,
           prestigeCount: Number.isFinite(saved.prestigeCount) ? Math.max(0, saved.prestigeCount) : 0,
-          usedCodes: Array.isArray(saved.usedCodes) ? saved.usedCodes : []
+          usedCodes: Array.isArray(saved.usedCodes) ? saved.usedCodes : [],
+          passiveLevel: Number.isFinite(saved.passiveLevel) ? Math.max(0, Math.floor(saved.passiveLevel)) : 0,
+          lastSavedAt: Number.isFinite(saved.lastSavedAt) ? saved.lastSavedAt : Date.now()
         };
       } catch (error) {
-        return { money: 0, rebirthCount: 0, rebirthMult: 1, prestigeCount: 0, usedCodes: [] };
+        return { money: 0, rebirthCount: 0, rebirthMult: 1, prestigeCount: 0, usedCodes: [], passiveLevel: 0, lastSavedAt: Date.now() };
       }
     }
 
     function saveState() {
       try {
+        state.lastSavedAt = Date.now();
         localStorage.setItem(SAVE_KEY, JSON.stringify(state));
       } catch (error) {
         setStatus("Could not save progress in this browser.", "error");
@@ -325,13 +414,10 @@
       return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
     }
 
-    function prestigeMultiplier() {
-      return 1 + state.prestigeCount * 0.5;
-    }
-
-    function totalMultiplier() {
-      return state.rebirthMult * prestigeMultiplier();
-    }
+    function prestigeMultiplier() { return 1 + state.prestigeCount * 0.5; }
+    function totalMultiplier() { return state.rebirthMult * prestigeMultiplier(); }
+    function passiveRate() { return state.passiveLevel * 2 * totalMultiplier(); }
+    function passiveCost() { return Math.floor(25 * Math.pow(1.65, state.passiveLevel)); }
 
     function setStatus(message, type = "") {
       status.textContent = message;
@@ -346,23 +432,22 @@
       document.querySelector("#prestiges").textContent = formatNumber(state.prestigeCount);
       document.querySelector("#prestige-mult").textContent = formatNumber(prestigeMultiplier());
       document.querySelector("#earn-amount").textContent = formatNumber(total);
-
+      document.querySelector("#passive-rate").textContent = formatNumber(passiveRate());
+      document.querySelector("#passive-level").textContent = formatNumber(state.passiveLevel);
+      document.querySelector("#passive-cost").textContent = formatNumber(passiveCost());
+      document.querySelector("#upgrade-passive-btn").disabled = state.money < passiveCost();
       rebirthButton.disabled = state.money < REBIRTH_COST;
       prestigeButton.disabled = state.rebirthCount < PRESTIGE_REBIRTH_COST;
       document.querySelector("#rebirth-progress").style.width = Math.min(100, (state.money / REBIRTH_COST) * 100) + "%";
     }
 
-    function earnmoney() {
+    function earnMoney() {
       const payout = totalMultiplier();
       const lucky = Math.random() < 0.05;
       state.money += lucky ? payout * 26 : payout;
       updateDisplay();
       saveState();
-
-      if (lucky) {
-        setStatus("🍀 Lucky click! A star shower gave you " + formatNumber(payout * 25) + " bonus money!", "lucky");
-      }
-
+      if (lucky) setStatus("🍀 Lucky click! A star shower gave you " + formatNumber(payout * 25) + " bonus money!", "lucky");
       earnButton.disabled = true;
       setTimeout(() => { earnButton.disabled = false; }, 100);
     }
@@ -372,7 +457,6 @@
         setStatus("You need " + formatNumber(REBIRTH_COST) + " money to rebirth.", "error");
         return;
       }
-
       state.money = 0;
       state.rebirthCount += 1;
       state.rebirthMult = Math.round((state.rebirthMult + 0.25) * 100) / 100;
@@ -386,7 +470,6 @@
         setStatus("You need " + PRESTIGE_REBIRTH_COST + " rebirths to prestige.", "error");
         return;
       }
-
       state.money = 0;
       state.rebirthCount = 0;
       state.rebirthMult = 1;
@@ -396,15 +479,59 @@
       setStatus("🌌 Prestige unlocked! Permanent prestige boost: " + formatNumber(prestigeMultiplier()) + "x.", "success");
     }
 
+    function upgradePassive() {
+      const cost = passiveCost();
+      if (state.money < cost) return;
+      state.money -= cost;
+      state.passiveLevel += 1;
+      updateDisplay();
+      saveState();
+      setStatus("Income upgraded! You now earn " + formatNumber(passiveRate()) + " money per second.", "success");
+    }
+
+    function updateFightDisplay() {
+      document.querySelector("#player-hp-text").textContent = fight.playerHp;
+      document.querySelector("#enemy-hp-text").textContent = fight.enemyHp;
+      document.querySelector("#player-health").style.width = Math.max(0, fight.playerHp) + "%";
+      document.querySelector("#enemy-health").style.width = Math.max(0, (fight.enemyHp / fight.enemyMaxHp) * 100) + "%";
+      document.querySelector("#fight-wins").textContent = formatNumber(fight.wins);
+    }
+
+    function attack() {
+      const damage = Math.max(1, Math.floor(totalMultiplier() * (8 + Math.random() * 8)));
+      fight.enemyHp = Math.max(0, fight.enemyHp - damage);
+      if (fight.enemyHp === 0) {
+        const reward = (20 + fight.wins * 5) * totalMultiplier();
+        fight.wins += 1;
+        state.money += reward;
+        fight.playerHp = 100;
+        fight.enemyMaxHp = 25 + fight.wins * 10;
+        fight.enemyHp = fight.enemyMaxHp;
+        updateFightDisplay();
+        updateDisplay();
+        saveState();
+        setStatus("🏆 Stickman defeated! You earned " + formatNumber(reward) + " money.", "success");
+        return;
+      }
+
+      const enemyDamage = 5 + Math.floor(Math.random() * 9);
+      fight.playerHp = Math.max(0, fight.playerHp - enemyDamage);
+      if (fight.playerHp === 0) {
+        fight.playerHp = 100;
+        setStatus("The stickman got you! You recovered—try again.", "error");
+      } else {
+        setStatus("You dealt " + damage + " damage. The stickman hit back for " + enemyDamage + ".");
+      }
+      updateFightDisplay();
+    }
+
     function redeemCode() {
       const enteredCode = inputField.value.trim().toLowerCase();
-
       if (state.usedCodes.includes(enteredCode)) {
         setStatus("This code has already been redeemed.", "error");
         inputField.select();
         return;
       }
-
       if (Object.hasOwn(codes, enteredCode)) {
         const reward = codes[enteredCode];
         state.money += reward;
@@ -419,15 +546,53 @@
       }
     }
 
-    earnButton.addEventListener("click", earnmoney);
+    function selectTab(tab) {
+      document.querySelectorAll("[role='tab']").forEach(button => {
+        const selected = button === tab;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+        document.querySelector("#" + button.getAttribute("aria-controls")).hidden = !selected;
+      });
+    }
+
+    document.querySelectorAll("[role='tab']").forEach((tab, index, tabs) => {
+      tab.addEventListener("click", () => selectTab(tab));
+      tab.addEventListener("keydown", event => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        event.preventDefault();
+        const offset = event.key === "ArrowRight" ? 1 : -1;
+        const nextTab = tabs[(index + offset + tabs.length) % tabs.length];
+        selectTab(nextTab);
+        nextTab.focus();
+      });
+    });
+
+    earnButton.addEventListener("click", earnMoney);
     rebirthButton.addEventListener("click", rebirth);
     prestigeButton.addEventListener("click", prestige);
     redeemButton.addEventListener("click", redeemCode);
+    document.querySelector("#upgrade-passive-btn").addEventListener("click", upgradePassive);
+    document.querySelector("#fight-btn").addEventListener("click", attack);
     inputField.addEventListener("keydown", event => {
       if (event.key === "Enter") redeemCode();
     });
 
+    const awaySeconds = Math.min(OFFLINE_CAP_SECONDS, Math.max(0, (Date.now() - state.lastSavedAt) / 1000));
+    if (awaySeconds > 1 && state.passiveLevel > 0) {
+      const offlineEarnings = passiveRate() * awaySeconds;
+      state.money += offlineEarnings;
+      setStatus("Welcome back! Your businesses earned " + formatNumber(offlineEarnings) + " while you were away.", "success");
+    }
     updateDisplay();
+    updateFightDisplay();
+    saveState();
+
+    setInterval(() => {
+      if (state.passiveLevel <= 0) return;
+      state.money += passiveRate();
+      updateDisplay();
+      saveState();
+    }, 1000);
   </script>
 </body>
 </html>
