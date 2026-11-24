@@ -9,57 +9,97 @@
 </head>
 <body>
   <main class="shell">
-    <button id="earn-btn" onclick="earnmoney()">earn</button>
-    <button id="rebirth-btn" onclick="rebirth()">rebirth</button>
-    <textbox>Codes?</textbox>
+    <button id="earn-btn" onclick="earnmoney()">Earn</button>
+    <button id="rebirth-btn" onclick="rebirth()" disabled>Rebirth</button>
+  
+    <div>
+      <input type="text" id="code-input" placeholder="Enter code...">
+      <button onclick="redeemCode()">Redeem</button>
+    </div>
+
     <h3 style="color: red;">Money: <span id="money">0</span></h3>
+    <p>Rebirths: <span id="rebirths">0</span> (<span id="mult">1</span>x)</p>
   </main>
 
   <script>
     let money = 0;
-    let rebirth = 0;
-    let rebirthmuit = 1;
+    let rebirthCount = 0; 
+    let rebirthMult = 1;
     let cht = false;
+
+  
     let codes = {
-      bob,
-      cod,
-      bolt,
-      money,
-      100k,
-    }
+      "bob": 500,
+      "cod": 1000,
+      "bolt": 2500,
+      "money": 10000,
+      "100k": 100000
+    };
+
     const earnButton = document.querySelector("#earn-btn");
     const rebirthButton = document.querySelector("#rebirth-btn");
-    function earnmoney() {
-      money += 1;
+
+    function updateDisplay() {
       document.getElementById("money").textContent = money;
+      document.getElementById("rebirths").textContent = rebirthCount;
+      document.getElementById("mult").textContent = rebirthMult;
       
+     
+      rebirthButton.disabled = money < 100 || cht;
+    }
+
+    function earnmoney() {
+      if (cht) return;
+      
+      money += 1 * rebirthMult; 
+      updateDisplay();
       
       earnButton.disabled = true;
-if (money >= 1000) {
-  rebirthbutton.disabled = false
-} else {
-  rebirthbutton.disabled = true
-}
-      
       setTimeout(() => {
-        earnButton.disabled = false;
+        if (!cht) earnButton.disabled = false;
       }, 100);
     }
-    function rebirth()
-    if (money < 1000) {
-      alert("cht detected")
-      cht = true;
-      earnbutton.disabled = true;
-      rebirthbutton.disabled = true;
-      codes = "";
-      money = 0;
-      rebirth = 0;
-    } else {
-      money = 0;
-      rebirthmuiti += 0.25;
-      alert("rebirthed")
+
+    function rebirth() {
+      if (money < 1000) {
+        alert("cht detected");
+        cht = true;
+        earnButton.disabled = true;
+        rebirthButton.disabled = true;
+        codes = {}; 
+        money = 0;
+        rebirthCount = 0;
+        updateDisplay();
+      } else {
+        money = 0;
+        rebirthCount += 1;
+        rebirthMult += 0.25;
+        updateDisplay();
+        alert("Rebirthed! Multiplier is now " + rebirthMult + "x");
+      }
     }
-      
+
+    function redeemCode() {
+      if (cht) {
+        alert("Nice try, cheater!");
+        return;
+      }
+
+      const inputField = document.getElementById("code-input");
+      const enteredCode = inputField.value.trim().toLowerCase(); 
+
+
+      if (codes[enteredCode]) {
+        money += codes[enteredCode];
+        alert("Code redeemed! +$" + codes[enteredCode]);
+        
+        delete codes[enteredCode]; 
+        inputField.value = ""; 
+        updateDisplay();
+      } else {
+        alert("Invalid or already used code!");
+      }
+    }
   </script>
 </body>
 </html>
