@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101321">
-  <meta name="description" content="A polished clicker game that saves progress on your device.">
+  <meta name="description" content="A clicker game with rebirths, prestige, lucky clicks, and progress saved on your device.">
   <title>Clicker Learning</title>
   <style>
     :root {
@@ -19,6 +19,7 @@
       --gold: #ffc857;
       --danger: #ff6978;
       --success: #55d6a4;
+      --pink: #ff83c5;
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +39,7 @@
     }
 
     .shell {
-      width: min(520px, 100%);
+      width: min(560px, 100%);
       padding: clamp(22px, 5vw, 38px);
       border: 1px solid var(--panel-border);
       border-radius: 28px;
@@ -47,32 +48,20 @@
       backdrop-filter: blur(16px);
     }
 
-    header {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(28px, 8vw, 42px);
-      letter-spacing: -0.04em;
-    }
-
-    .subtitle {
-      margin: 8px 0 0;
-      color: var(--muted);
-    }
+    header { margin-bottom: 24px; text-align: center; }
+    h1 { margin: 0; font-size: clamp(28px, 8vw, 42px); letter-spacing: -0.04em; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); }
 
     .stats {
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 10px;
       margin-bottom: 18px;
     }
 
     .stat {
       min-width: 0;
-      padding: 16px;
+      padding: 14px;
       border: 1px solid var(--panel-border);
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.035);
@@ -82,9 +71,9 @@
       display: block;
       margin-bottom: 4px;
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       font-weight: 800;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
@@ -92,16 +81,16 @@
       display: block;
       overflow: hidden;
       color: var(--gold);
-      font-size: clamp(22px, 6vw, 32px);
+      font-size: clamp(20px, 5vw, 28px);
       font-weight: 800;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .rebirth-card {
-      text-align: right;
-    }
-
+    .rebirth-card { text-align: center; }
     .rebirth-card .stat-value { color: var(--success); }
+    .prestige-card { text-align: right; }
+    .prestige-card .stat-value { color: var(--pink); }
 
     .progress-track {
       height: 8px;
@@ -123,7 +112,7 @@
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
     }
 
     button {
@@ -142,7 +131,7 @@
     button:disabled { cursor: not-allowed; opacity: 0.42; }
 
     #earn-btn {
-      min-height: 88px;
+      min-height: 78px;
       background: linear-gradient(135deg, var(--accent), var(--accent-strong));
       box-shadow: 0 12px 32px rgba(101, 89, 234, 0.28);
       font-size: 1.15rem;
@@ -155,11 +144,29 @@
       color: #9ff3ce;
     }
 
-    .code-box {
+    .prestige-panel {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 10px;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding: 15px 16px;
+      border: 1px solid rgba(255, 131, 197, 0.2);
+      border-radius: 18px;
+      background: linear-gradient(110deg, rgba(255, 131, 197, 0.09), rgba(139, 124, 255, 0.08));
     }
+
+    .prestige-title { margin: 0 0 4px; font-weight: 800; }
+    .prestige-help { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+
+    #prestige-btn {
+      padding: 0 18px;
+      background: linear-gradient(135deg, #d65baf, #8958e8);
+      box-shadow: 0 8px 22px rgba(214, 91, 175, 0.18);
+      white-space: nowrap;
+    }
+
+    .code-box { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 
     input {
       width: 100%;
@@ -195,12 +202,17 @@
 
     .status.error { color: var(--danger); }
     .status.success { color: var(--success); }
+    .status.lucky { color: var(--gold); }
 
     @media (max-width: 480px) {
       body { padding: 12px; }
       .shell { border-radius: 22px; }
+      .stats { grid-template-columns: 1.2fr 1fr; }
+      .prestige-card { grid-column: 1 / -1; text-align: left; }
       .actions { grid-template-columns: 1fr; }
       #rebirth-btn { width: 100%; }
+      .prestige-panel { grid-template-columns: 1fr; }
+      #prestige-btn { width: 100%; }
       .code-box { grid-template-columns: 1fr; }
       #redeem-btn { width: 100%; }
     }
@@ -223,8 +235,12 @@
         <span class="stat-value" id="money">0</span>
       </div>
       <div class="stat rebirth-card">
-        <span class="stat-label">Rebirths</span>
+        <span class="stat-label">Rebirths · Total boost</span>
         <span class="stat-value"><span id="rebirths">0</span> · <span id="mult">1</span>x</span>
+      </div>
+      <div class="stat prestige-card">
+        <span class="stat-label">Prestige</span>
+        <span class="stat-value"><span id="prestiges">0</span> · <span id="prestige-mult">1</span>x</span>
       </div>
     </section>
 
@@ -233,8 +249,16 @@
     </div>
 
     <section class="actions">
-      <button id="earn-btn" type="button">Earn +<span id="earn-amount">1</span></button>
+      <button id="earn-btn" type="button">✨ Earn +<span id="earn-amount">1</span></button>
       <button id="rebirth-btn" type="button" disabled>Rebirth</button>
+    </section>
+
+    <section class="prestige-panel" aria-label="Prestige upgrade">
+      <div>
+        <p class="prestige-title">🌌 Prestige</p>
+        <p class="prestige-help">Requires 100,000 money. Resets money and rebirths, but adds +0.50 to your permanent prestige boost.</p>
+      </div>
+      <button id="prestige-btn" type="button" disabled>Prestige</button>
     </section>
 
     <div class="code-box">
@@ -242,14 +266,15 @@
       <button id="redeem-btn" type="button">Redeem</button>
     </div>
 
-    <p class="status" id="status" role="status" aria-live="polite">Progress is saved on this device.</p>
+    <p class="status" id="status" role="status" aria-live="polite">Progress is saved on this device. Lucky clicks can happen any time!</p>
   </main>
 
   <script>
     const SAVE_KEY = "clickerLearningSaveV1";
     const REBIRTH_COST = 1000;
+    const PRESTIGE_COST = 100000;
 
-    let codes = {
+    const codes = {
       bob: 500,
       cod: 1000,
       bolt: 2500,
@@ -264,9 +289,9 @@
     };
 
     let state = loadState();
-
     const earnButton = document.querySelector("#earn-btn");
     const rebirthButton = document.querySelector("#rebirth-btn");
+    const prestigeButton = document.querySelector("#prestige-btn");
     const redeemButton = document.querySelector("#redeem-btn");
     const inputField = document.querySelector("#code-input");
     const status = document.querySelector("#status");
@@ -280,10 +305,11 @@
           money: Number.isFinite(saved.money) ? Math.max(0, saved.money) : 0,
           rebirthCount: Number.isFinite(saved.rebirthCount) ? Math.max(0, saved.rebirthCount) : 0,
           rebirthMult: Number.isFinite(saved.rebirthMult) ? Math.max(1, saved.rebirthMult) : 1,
+          prestigeCount: Number.isFinite(saved.prestigeCount) ? Math.max(0, saved.prestigeCount) : 0,
           usedCodes: Array.isArray(saved.usedCodes) ? saved.usedCodes : []
         };
       } catch (error) {
-        return { money: 0, rebirthCount: 0, rebirthMult: 1, usedCodes: [] };
+        return { money: 0, rebirthCount: 0, rebirthMult: 1, prestigeCount: 0, usedCodes: [] };
       }
     }
 
@@ -296,9 +322,15 @@
     }
 
     function formatNumber(value) {
-      return new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 2
-      }).format(value);
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
+    }
+
+    function prestigeMultiplier() {
+      return 1 + state.prestigeCount * 0.5;
+    }
+
+    function totalMultiplier() {
+      return state.rebirthMult * prestigeMultiplier();
     }
 
     function setStatus(message, type = "") {
@@ -307,25 +339,32 @@
     }
 
     function updateDisplay() {
+      const total = totalMultiplier();
       document.querySelector("#money").textContent = formatNumber(state.money);
       document.querySelector("#rebirths").textContent = formatNumber(state.rebirthCount);
-      document.querySelector("#mult").textContent = formatNumber(state.rebirthMult);
-      document.querySelector("#earn-amount").textContent = formatNumber(state.rebirthMult);
+      document.querySelector("#mult").textContent = formatNumber(total);
+      document.querySelector("#prestiges").textContent = formatNumber(state.prestigeCount);
+      document.querySelector("#prestige-mult").textContent = formatNumber(prestigeMultiplier());
+      document.querySelector("#earn-amount").textContent = formatNumber(total);
 
       rebirthButton.disabled = state.money < REBIRTH_COST;
-      const progress = Math.min(100, (state.money / REBIRTH_COST) * 100);
-      document.querySelector("#rebirth-progress").style.width = progress + "%";
+      prestigeButton.disabled = state.money < PRESTIGE_COST;
+      document.querySelector("#rebirth-progress").style.width = Math.min(100, (state.money / REBIRTH_COST) * 100) + "%";
     }
 
     function earnmoney() {
-      state.money += state.rebirthMult;
+      const payout = totalMultiplier();
+      const lucky = Math.random() < 0.05;
+      state.money += lucky ? payout * 26 : payout;
       updateDisplay();
       saveState();
 
+      if (lucky) {
+        setStatus("🍀 Lucky click! A star shower gave you " + formatNumber(payout * 25) + " bonus money!", "lucky");
+      }
+
       earnButton.disabled = true;
-      setTimeout(() => {
-        earnButton.disabled = false;
-      }, 100);
+      setTimeout(() => { earnButton.disabled = false; }, 100);
     }
 
     function rebirth() {
@@ -339,7 +378,22 @@
       state.rebirthMult = Math.round((state.rebirthMult + 0.25) * 100) / 100;
       updateDisplay();
       saveState();
-      setStatus("Rebirthed! Your multiplier is now " + formatNumber(state.rebirthMult) + "x.", "success");
+      setStatus("Rebirthed! Your total multiplier is now " + formatNumber(totalMultiplier()) + "x.", "success");
+    }
+
+    function prestige() {
+      if (state.money < PRESTIGE_COST) {
+        setStatus("You need " + formatNumber(PRESTIGE_COST) + " money to prestige.", "error");
+        return;
+      }
+
+      state.money = 0;
+      state.rebirthCount = 0;
+      state.rebirthMult = 1;
+      state.prestigeCount += 1;
+      updateDisplay();
+      saveState();
+      setStatus("🌌 Prestige unlocked! Permanent prestige boost: " + formatNumber(prestigeMultiplier()) + "x.", "success");
     }
 
     function redeemCode() {
@@ -367,6 +421,7 @@
 
     earnButton.addEventListener("click", earnmoney);
     rebirthButton.addEventListener("click", rebirth);
+    prestigeButton.addEventListener("click", prestige);
     redeemButton.addEventListener("click", redeemCode);
     inputField.addEventListener("keydown", event => {
       if (event.key === "Enter") redeemCode();
