@@ -11,13 +11,14 @@
   <main class="shell">
 <button onclick="earnmoney()">earn</button>
 <h3>"Money:"</h3>
-    <p1 style="background-color= red"><?money?></p1>
+    <p1 style="background-color= red"><span id="money"></span>!</p1>
     
   </main>
   <script>
 let money = 0
     function earnmoney() {
       money += 1
+      document.getElementById("money").textContent = money;
 }
   </script>
 </body>
