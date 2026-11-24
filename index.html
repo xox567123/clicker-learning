@@ -10,6 +10,7 @@
 <body>
   <main class="shell">
     <button id="earn-btn" onclick="earnmoney()">earn</button>
+    <button id="rebirth-btn" onclick="rebirth()">rebirth</button>
     <textbox>Codes?</textbox>
     <h3 style="color: red;">Money: <span id="money">0</span></h3>
   </main>
@@ -17,6 +18,7 @@
   <script>
     let money = 0;
     let rebirth = 0;
+    let rebirthmuit = 1;
     let cht = false;
     let codes = {
       bob,
@@ -26,19 +28,38 @@
       100k,
     }
     const earnButton = document.querySelector("#earn-btn");
-
+    const rebirthButton = document.querySelector("#rebirth-btn");
     function earnmoney() {
       money += 1;
       document.getElementById("money").textContent = money;
       
       
       earnButton.disabled = true;
-
+if (money >= 1000) {
+  rebirthbutton.disabled = false
+} else {
+  rebirthbutton.disabled = true
+}
       
       setTimeout(() => {
         earnButton.disabled = false;
       }, 100);
     }
+    function rebirth()
+    if (money < 1000) {
+      alert("cht detected")
+      cht = true;
+      earnbutton.disabled = true;
+      rebirthbutton.disabled = true;
+      codes = "";
+      money = 0;
+      rebirth = 0;
+    } else {
+      money = 0;
+      rebirthmuiti += 0.25;
+      alert("rebirthed")
+    }
+      
   </script>
 </body>
 </html>
