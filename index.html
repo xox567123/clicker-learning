@@ -33,7 +33,13 @@
       "cod": 1000,
       "bolt": 2500,
       "money": 10000,
-      "100k": 100000
+      "100k": 100000,
+      "r1": 1001,
+      "r2": 1001,
+      "r3": 1001,
+      "r4": 1001,
+      "r5": 1001,
+      "r6": 1001,
     };
 
     const earnButton = document.querySelector("#earn-btn");
@@ -45,7 +51,7 @@
       document.getElementById("mult").textContent = rebirthMult;
       
      
-      rebirthButton.disabled = money < 100 || cht;
+      rebirthButton.disabled = money < 1000 || cht;
     }
 
     function earnmoney() {
