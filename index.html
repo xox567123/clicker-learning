@@ -256,7 +256,7 @@
     <section class="prestige-panel" aria-label="Prestige upgrade">
       <div>
         <p class="prestige-title">🌌 Prestige</p>
-        <p class="prestige-help">Requires 100,000 money. Resets money and rebirths, but adds +0.50 to your permanent prestige boost.</p>
+        <p class="prestige-help">Requires 10 rebirths. Prestige resets your money and rebirths, but adds +0.50 to your permanent prestige boost.</p>
       </div>
       <button id="prestige-btn" type="button" disabled>Prestige</button>
     </section>
@@ -272,7 +272,7 @@
   <script>
     const SAVE_KEY = "clickerLearningSaveV1";
     const REBIRTH_COST = 1000;
-    const PRESTIGE_COST = 100000;
+    const PRESTIGE_REBIRTH_COST = 10;
 
     const codes = {
       bob: 500,
@@ -348,7 +348,7 @@
       document.querySelector("#earn-amount").textContent = formatNumber(total);
 
       rebirthButton.disabled = state.money < REBIRTH_COST;
-      prestigeButton.disabled = state.money < PRESTIGE_COST;
+      prestigeButton.disabled = state.rebirthCount < PRESTIGE_REBIRTH_COST;
       document.querySelector("#rebirth-progress").style.width = Math.min(100, (state.money / REBIRTH_COST) * 100) + "%";
     }
 
@@ -382,8 +382,8 @@
     }
 
     function prestige() {
-      if (state.money < PRESTIGE_COST) {
-        setStatus("You need " + formatNumber(PRESTIGE_COST) + " money to prestige.", "error");
+      if (state.rebirthCount < PRESTIGE_REBIRTH_COST) {
+        setStatus("You need " + PRESTIGE_REBIRTH_COST + " rebirths to prestige.", "error");
         return;
       }
 
