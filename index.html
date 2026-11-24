@@ -10,11 +10,21 @@
 <body>
   <main class="shell">
     <button id="earn-btn" onclick="earnmoney()">earn</button>
+    <textbox>Codes?</textbox>
     <h3 style="color: red;">Money: <span id="money">0</span></h3>
   </main>
 
   <script>
     let money = 0;
+    let rebirth = 0;
+    let cht = false;
+    let codes = {
+      bob,
+      cod,
+      bolt,
+      money,
+      100k,
+    }
     const earnButton = document.querySelector("#earn-btn");
 
     function earnmoney() {
